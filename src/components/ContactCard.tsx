@@ -5,10 +5,8 @@ import {
   Briefcase,
   Mail,
   MessageCircle,
-  Sparkles,
   type LucideIcon,
 } from "lucide-react";
-import { siGithub } from "simple-icons";
 import type { CONTACT_CARDS } from "@/lib/constants";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -18,7 +16,6 @@ const LINKEDIN_PATH =
 
 const ICONS: Record<string, LucideIcon> = {
   Briefcase,
-  Sparkles,
   MessageCircle,
 };
 
@@ -37,11 +34,6 @@ const ACTION_STYLES: Record<
     bg: "var(--color-accent-blue)",
     icon: { type: "lucide", Icon: Mail },
     label: "Send email",
-  },
-  github: {
-    bg: "#24292F",
-    icon: { type: "svg", path: siGithub.path },
-    label: "Open GitHub",
   },
 };
 

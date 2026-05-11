@@ -15,7 +15,6 @@ export const RESUME_URL = "/prateek-saxena-resume.pdf";
 
 export const SOCIALS = {
   linkedin: "https://www.linkedin.com/in/prateek-saxena-14331895/",
-  github: "",
   phone: "+19452334708",
 };
 

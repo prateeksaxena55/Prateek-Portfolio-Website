@@ -2,14 +2,19 @@
 
 import { useEffect, useRef, useState } from "react";
 
-const GRID_COLS = 5;
-const GRID_ROWS = 4;
+const DESKTOP_GRID_COLS = 5;
+const DESKTOP_GRID_ROWS = 4;
+const MOBILE_GRID_COLS = 4;
+const MOBILE_GRID_ROWS = 3;
 const NEIGHBORS_PER_NODE = 2;
-const PULSE_SLOTS = 6;
+const MAX_PULSE_SLOTS = 6;
+const DESKTOP_PULSE_LIMIT = 6;
+const MOBILE_PULSE_LIMIT = 3;
 const PULSE_DURATION_MS = 1200;
 const TRAIL_COUNT = 6;
 const LINE_BASE_OPACITY = 0.12;
 const LINE_PULSE_OPACITY = 0.4;
+const MOBILE_BREAKPOINT = "(max-width: 767px)";
 
 const HEAD_LAYERS: { r: number; fill: string; base: number }[] = [
   { r: 18, fill: "var(--color-accent-blue)", base: 0.25 },
@@ -47,13 +52,13 @@ function makeRng(seed: number) {
   };
 }
 
-function generateNodes(w: number, h: number): Node[] {
+function generateNodes(w: number, h: number, cols: number, rows: number): Node[] {
   const rng = makeRng(0xa61c1);
   const nodes: Node[] = [];
-  const cellW = w / GRID_COLS;
-  const cellH = h / GRID_ROWS;
-  for (let r = 0; r < GRID_ROWS; r++) {
-    for (let c = 0; c < GRID_COLS; c++) {
+  const cellW = w / cols;
+  const cellH = h / rows;
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
       nodes.push({
         baseX: cellW * (c + 0.2 + rng() * 0.6),
         baseY: cellH * (r + 0.2 + rng() * 0.6),
@@ -101,33 +106,54 @@ export default function AgenticMesh() {
   const pulseHeadCircleRefs = useRef<Array<Array<SVGCircleElement | null>>>([]);
   const pulseTrailCircleRefs = useRef<Array<Array<SVGCircleElement | null>>>([]);
   const pulsesRef = useRef<Pulse[]>(
-    Array.from({ length: PULSE_SLOTS }, () => ({ active: false, edgeIndex: 0, startTime: 0 })),
+    Array.from({ length: MAX_PULSE_SLOTS }, () => ({ active: false, edgeIndex: 0, startTime: 0 })),
   );
+  const pulseLimitRef = useRef<number>(DESKTOP_PULSE_LIMIT);
   const nodesRef = useRef<Node[]>([]);
   const edgesRef = useRef<[number, number][]>([]);
   const [dims, setDims] = useState({ w: 0, h: 0 });
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia(MOBILE_BREAKPOINT);
+    const onChange = () => setIsMobile(mq.matches);
+    onChange();
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  useEffect(() => {
+    pulseLimitRef.current = isMobile ? MOBILE_PULSE_LIMIT : DESKTOP_PULSE_LIMIT;
+  }, [isMobile]);
 
   useEffect(() => {
     const update = () => {
       const w = window.innerWidth;
       const h = window.innerHeight;
       if (w < 1 || h < 1) return;
-      nodesRef.current = generateNodes(w, h);
+      const cols = isMobile ? MOBILE_GRID_COLS : DESKTOP_GRID_COLS;
+      const rows = isMobile ? MOBILE_GRID_ROWS : DESKTOP_GRID_ROWS;
+      nodesRef.current = generateNodes(w, h, cols, rows);
       edgesRef.current = buildEdges(nodesRef.current);
       setDims({ w, h });
     };
     update();
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
-  }, []);
+  }, [isMobile]);
 
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout> | null = null;
     const spawn = () => {
       const edges = edgesRef.current;
       if (edges.length > 0) {
-        const free = pulsesRef.current.find((p) => !p.active);
-        if (free) {
+        const limit = pulseLimitRef.current;
+        let freeIdx = -1;
+        for (let i = 0; i < limit; i++) {
+          if (!pulsesRef.current[i].active) { freeIdx = i; break; }
+        }
+        if (freeIdx >= 0) {
+          const free = pulsesRef.current[freeIdx];
           free.active = true;
           free.edgeIndex = Math.floor(Math.random() * edges.length);
           free.startTime = performance.now();
@@ -169,7 +195,7 @@ export default function AgenticMesh() {
           l.setAttribute("stroke-opacity", String(LINE_BASE_OPACITY));
         }
       }
-      for (let p = 0; p < PULSE_SLOTS; p++) {
+      for (let p = 0; p < MAX_PULSE_SLOTS; p++) {
         const pulse = pulsesRef.current[p];
         const root = pulseRootRefs.current[p];
         if (!root) continue;
@@ -226,7 +252,6 @@ export default function AgenticMesh() {
   return (
     <div
       aria-hidden
-      className="hidden md:block"
       style={{
         position: "fixed",
         inset: 0,
@@ -254,7 +279,7 @@ export default function AgenticMesh() {
               />
             );
           })}
-          {Array.from({ length: PULSE_SLOTS }, (_, p) => (
+          {Array.from({ length: MAX_PULSE_SLOTS }, (_, p) => (
             <g key={`pulse-${p}`} ref={(el) => { pulseRootRefs.current[p] = el; }} opacity={0}>
               {Array.from({ length: TRAIL_COUNT }, (_, i) => (
                 <circle
