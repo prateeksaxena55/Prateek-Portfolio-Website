@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { motion, type Variants } from "framer-motion";
 import { Download, Phone } from "lucide-react";
 import BouncingTerminalGroup from "@/components/BouncingTerminalGroup";
-import { HERO, RESUME_URL, SOCIALS } from "@/lib/constants";
+import { HERO, RESUME_URL, SOCIALS, VOICE_AGENT_PHONE, PERSONAL_PHONE } from "@/lib/constants";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const MONO = "var(--font-mono), ui-monospace, monospace";
@@ -181,7 +181,19 @@ export default function Hero() {
                   </a>
 
                   <a
-                    href={`tel:${SOCIALS.phone}`}
+                    href={`tel:${VOICE_AGENT_PHONE}`}
+                    aria-label="Call my voice agent"
+                    className="inline-flex items-center gap-2 rounded-lg px-5 py-3 transition-colors"
+                    style={SECONDARY_BTN}
+                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--color-text-primary)"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--color-border)"; }}
+                  >
+                    <Phone size={15} strokeWidth={2} />
+                    Call My Voice Agent
+                  </a>
+
+                  <a
+                    href={`tel:${PERSONAL_PHONE}`}
                     aria-label="Call me"
                     className="inline-flex items-center gap-2 rounded-lg px-5 py-3 transition-colors"
                     style={SECONDARY_BTN}

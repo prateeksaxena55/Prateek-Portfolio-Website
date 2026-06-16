@@ -15,8 +15,10 @@ export const RESUME_URL = "/prateek-saxena-resume.pdf";
 
 export const SOCIALS = {
   linkedin: "https://www.linkedin.com/in/prateek-saxena-14331895/",
-  phone: "+19452334708",
 };
+
+export const VOICE_AGENT_PHONE = "+17432263633";
+export const PERSONAL_PHONE = "+19452334708";
 
 export const HERO = {
   eyebrow: "AI ENGINEER · 7+ YEARS · OPEN TO ROLES & RELOCATION",

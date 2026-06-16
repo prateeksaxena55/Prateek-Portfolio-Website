@@ -68,28 +68,39 @@ export default function ExperienceModal({
               maxHeight: "88vh",
             }}
           >
-            <button
-              type="button"
-              aria-label="Close modal"
-              onClick={onClose}
-              className="absolute inline-flex items-center justify-center transition-colors"
+            <div
               style={{
-                top: 16,
-                right: 16,
-                padding: 8,
-                borderRadius: 8,
-                backgroundColor: "transparent",
-                color: "var(--color-text-primary)",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "var(--color-border)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "transparent";
+                position: "sticky",
+                top: 0,
+                height: 0,
+                zIndex: 20,
+                pointerEvents: "none",
               }}
             >
-              <X size={20} strokeWidth={2} />
-            </button>
+              <button
+                type="button"
+                aria-label="Close modal"
+                onClick={onClose}
+                className="absolute inline-flex items-center justify-center transition-colors"
+                style={{
+                  top: 0,
+                  right: 0,
+                  padding: 8,
+                  borderRadius: 8,
+                  backgroundColor: "transparent",
+                  color: "var(--color-text-primary)",
+                  pointerEvents: "auto",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "var(--color-border)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "transparent";
+                }}
+              >
+                <X size={20} strokeWidth={2} />
+              </button>
+            </div>
 
             <header
               style={{
@@ -99,8 +110,8 @@ export default function ExperienceModal({
               }}
             >
               <div
-                className="flex flex-row items-center gap-3"
-                style={{ marginBottom: 16 }}
+                className="flex flex-row items-center gap-3 flex-wrap"
+                style={{ marginBottom: 16, paddingRight: 44 }}
               >
                 <span
                   className="type-eyebrow"
